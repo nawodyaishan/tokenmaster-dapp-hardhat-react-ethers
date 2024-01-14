@@ -1,27 +1,32 @@
 import {ethers} from "hardhat";
+import {expect} from "chai";
 
 export interface tokenMasterConstructorArgs {
     name: string
     symbol: string
 }
 
+const DEFAULT_CONTRACT_CONSTRUCTOR_ARGS: tokenMasterConstructorArgs = {name: "TokenMaster", symbol: "NAWO"}
+
 describe("Lock", function () {
     // We define a fixture to reuse the same setup in every test.
     // We use loadFixture to run this setup once, snapshot that state,
     // and reset Hardhat Network to that snapshot in every test.
-    async function deployOneYearLockFixture() {
+    async function deployTokenMasterFixture() {
         // Contracts are deployed using the first signer/account by default
         const [owner, otherAccount] = await ethers.getSigners();
-        const contractConstructorArgs = {}
-        const tokenMasterFactory = await ethers.getContractFactory("TokenMaster");
-        const tokenMaster = await tokenMasterFactory.deploy();
 
+        const tokenMasterFactory = await ethers.getContractFactory("TokenMaster");
+        const tokenMaster = await tokenMasterFactory.deploy(DEFAULT_CONTRACT_CONSTRUCTOR_ARGS.name, DEFAULT_CONTRACT_CONSTRUCTOR_ARGS.symbol);
+        console.log("Name", tokenMaster.name)
         return {tokenMaster, owner, otherAccount};
     }
 
     describe("Deployment", function () {
-        it("Should set the right unlockTime", async function () {
-
+        it("Sets the Name", async function () {
+            const {tokenMaster, owner, otherAccount} = await deployTokenMasterFixture();
+            expect(tokenMaster.name()).to.equal(DEFAULT_CONTRACT_CONSTRUCTOR_ARGS.name)
+            expect(tokenMaster.symbol()).to.equal(DEFAULT_CONTRACT_CONSTRUCTOR_ARGS.symbol)
         });
     });
 
