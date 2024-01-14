@@ -25,8 +25,8 @@ describe("Lock", function () {
     describe("Deployment", function () {
         it("Sets the Name", async function () {
             const {tokenMaster, owner, otherAccount} = await deployTokenMasterFixture();
-            expect(tokenMaster.name()).to.equal(DEFAULT_CONTRACT_CONSTRUCTOR_ARGS.name)
-            expect(tokenMaster.symbol()).to.equal(DEFAULT_CONTRACT_CONSTRUCTOR_ARGS.symbol)
+            expect(await tokenMaster.name()).to.equal(DEFAULT_CONTRACT_CONSTRUCTOR_ARGS.name)
+            expect(await tokenMaster.symbol()).to.equal(DEFAULT_CONTRACT_CONSTRUCTOR_ARGS.symbol)
         });
     });
 
