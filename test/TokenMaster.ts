@@ -10,8 +10,8 @@ export interface TokenMasterConstructorArgs {
 
 export interface TokenMasterFixture {
     tokenMaster: TokenMaster
-    owner: HardhatEthersSigner
-    otherAccount: HardhatEthersSigner
+    deployer: HardhatEthersSigner
+    buyer: HardhatEthersSigner
 }
 
 const DEFAULT_CONTRACT_CONSTRUCTOR_ARGS: TokenMasterConstructorArgs = {name: "TokenMaster", symbol: "NAWO"}
@@ -25,13 +25,17 @@ describe("Token Master Unit Testing", async () => {
         const tokenMasterFactory = await ethers.getContractFactory("TokenMaster");
         const tokenMaster = await tokenMasterFactory.deploy(DEFAULT_CONTRACT_CONSTRUCTOR_ARGS.name, DEFAULT_CONTRACT_CONSTRUCTOR_ARGS.symbol);
         // console.log("Name", tokenMaster.name)
-        tokenMasterFixture = {tokenMaster: tokenMaster, owner: owner, otherAccount: otherAccount};
+        tokenMasterFixture = {tokenMaster: tokenMaster, deployer: owner, buyer: otherAccount};
     })
 
     describe("Deployment", async () => {
-        it("Sets the Name", async function () {
+        it("Sets the Name", async () => {
             expect(await tokenMasterFixture.tokenMaster.name()).to.equal(DEFAULT_CONTRACT_CONSTRUCTOR_ARGS.name)
             expect(await tokenMasterFixture.tokenMaster.symbol()).to.equal(DEFAULT_CONTRACT_CONSTRUCTOR_ARGS.symbol)
+        });
+
+        it("Sets the Owner", async () => {
+            expect(await tokenMasterFixture.tokenMaster.getOwner()).to.equal(tokenMasterFixture.deployer.address)
         });
     });
 });
