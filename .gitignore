@@ -150,10 +150,6 @@ blockchain/geth/**
 blockchain/keystore/**
 blockchain/history
 
-#truffle
-yarn.lock
-package-lock.json
-
 ### Node template
 # Logs
 
