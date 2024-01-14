@@ -31,6 +31,9 @@ describe("Token Master Unit Testing", async () => {
     describe("Deployment", async () => {
         it("Sets the Name", async () => {
             expect(await tokenMasterFixture.tokenMaster.name()).to.equal(DEFAULT_CONTRACT_CONSTRUCTOR_ARGS.name)
+        });
+
+        it("Sets the Symbol", async () => {
             expect(await tokenMasterFixture.tokenMaster.symbol()).to.equal(DEFAULT_CONTRACT_CONSTRUCTOR_ARGS.symbol)
         });
 
