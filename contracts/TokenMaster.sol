@@ -41,7 +41,7 @@ contract TokenMaster is ERC721 {
     ) public {
         s_totalEvents++;
         m_events[s_totalEvents] = Event(
-            1,
+            s_totalEvents,
             _name,
             _cost,
             _maxTickets,
@@ -50,5 +50,9 @@ contract TokenMaster is ERC721 {
             _time,
             _location
         );
+    }
+
+    function getEventFromId(uint256 _id) public view returns (Event memory _event) {
+        _event = m_events[_id];
     }
 }

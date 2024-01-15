@@ -17,7 +17,7 @@ export interface TokenMasterFixture {
 interface MockEvent {
     id: number;
     name: string;
-    cost: number;
+    cost: bigint;
     maxTickets: number;
     tickets: number;
     date: string;
@@ -28,7 +28,7 @@ interface MockEvent {
 const exampleEvent: MockEvent = {
     id: 1,
     name: "Blockchain & Brews Conference 2024",
-    cost: 5,
+    cost: ethers.parseUnits('1', 'ether'),
     maxTickets: 500,
     tickets: 150,
     date: "2024-06-15",
@@ -68,7 +68,24 @@ describe("Token Master Unit Testing", async () => {
     describe("Events Interactions", async () => {
         it("Sets the Events", async () => {
             await tokenMasterFixture.tokenMaster.setEvent(exampleEvent.name, exampleEvent.cost, exampleEvent.maxTickets, exampleEvent.date, exampleEvent.time, exampleEvent.location);
-            expect(await tokenMasterFixture.tokenMaster.s_totalEvents()).to.be.equal(1)
+            expect(await tokenMasterFixture.tokenMaster.connect(tokenMasterFixture.deployer).s_totalEvents()).to.be.equal(1)
+            await tokenMasterFixture.tokenMaster.setEvent(exampleEvent.name, exampleEvent.cost, exampleEvent.maxTickets, exampleEvent.date, exampleEvent.time, exampleEvent.location);
+            expect(await tokenMasterFixture.tokenMaster.connect(tokenMasterFixture.deployer).s_totalEvents()).to.be.equal(2)
+            await tokenMasterFixture.tokenMaster.setEvent(exampleEvent.name, exampleEvent.cost, exampleEvent.maxTickets, exampleEvent.date, exampleEvent.time, exampleEvent.location);
+            expect(await tokenMasterFixture.tokenMaster.connect(tokenMasterFixture.deployer).s_totalEvents()).to.be.equal(3)
+        });
+
+        it("Gets the exact Event from Id", async () => {
+            await tokenMasterFixture.tokenMaster.setEvent(exampleEvent.name, exampleEvent.cost, exampleEvent.maxTickets, exampleEvent.date, exampleEvent.time, exampleEvent.location);
+            await tokenMasterFixture.tokenMaster.setEvent(exampleEvent.name, exampleEvent.cost, exampleEvent.maxTickets, exampleEvent.date, exampleEvent.time, exampleEvent.location);
+            await tokenMasterFixture.tokenMaster.setEvent(exampleEvent.name, exampleEvent.cost, exampleEvent.maxTickets, exampleEvent.date, exampleEvent.time, exampleEvent.location);
+            expect(await tokenMasterFixture.tokenMaster.s_totalEvents()).to.be.equal(3)
+
+            const event = (await tokenMasterFixture.tokenMaster.getEventFromId(1))
+            expect(event.id).to.be.equal(exampleEvent.id)
+            expect(event.name).to.be.equal(exampleEvent.name)
+            expect(event.date).to.be.equal(exampleEvent.date)
+            expect(event.cost).to.be.equal(exampleEvent.cost)
         });
     });
 });

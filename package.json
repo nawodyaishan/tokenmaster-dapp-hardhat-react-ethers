@@ -5,7 +5,6 @@
   "repository": "https://github.com/nawodyaishan/tokenmaster-dapp-hardhat-react-ethers.git",
   "author": "Nawodya Ishan <nawodyain@gmail.com>",
   "license": "MIT",
-  "private": null,
   "scripts": {
     "test": "yarn hardhat test",
     "test-staging": "yarn hardhat test --network sepolia",
