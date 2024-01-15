@@ -1,18 +1,15 @@
-import {Web3Modal} from "@/components/ui/Web3Modal";
+import '@rainbow-me/rainbowkit/styles.css';
+import {Providers} from './providers';
 import "./globals.css";
 
-
-export const metadata = {
-    title: "Web3Modal",
-    description: "Web3Modal Example",
-};
-
-export default function RootLayout({children}: { children: React.ReactNode }) {
+function RootLayout({children}: { children: React.ReactNode }) {
     return (
         <html lang="en">
         <body>
-        <Web3Modal>{children}</Web3Modal>
+        <Providers>{children}</Providers>
         </body>
         </html>
     );
 }
+
+export default RootLayout;
