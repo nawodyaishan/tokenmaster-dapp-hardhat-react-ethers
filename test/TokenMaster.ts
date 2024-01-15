@@ -14,6 +14,29 @@ export interface TokenMasterFixture {
     buyer: HardhatEthersSigner
 }
 
+interface MockEvent {
+    id: number;
+    name: string;
+    cost: number;
+    maxTickets: number;
+    tickets: number;
+    date: string;
+    time: string;
+    location: string;
+}
+
+const exampleEvent: MockEvent = {
+    id: 1,
+    name: "Blockchain & Brews Conference 2024",
+    cost: 5,
+    maxTickets: 500,
+    tickets: 150,
+    date: "2024-06-15",
+    time: "18:00",
+    location: "Metaverse Arena"
+};
+
+
 const DEFAULT_CONTRACT_CONSTRUCTOR_ARGS: TokenMasterConstructorArgs = {name: "TokenMaster", symbol: "NAWO"}
 
 describe("Token Master Unit Testing", async () => {
@@ -39,6 +62,13 @@ describe("Token Master Unit Testing", async () => {
 
         it("Sets the Owner", async () => {
             expect(await tokenMasterFixture.tokenMaster.getOwner()).to.equal(tokenMasterFixture.deployer.address)
+        });
+    });
+
+    describe("Events Interactions", async () => {
+        it("Sets the Events", async () => {
+            await tokenMasterFixture.tokenMaster.setEvent(exampleEvent.name, exampleEvent.cost, exampleEvent.maxTickets, exampleEvent.date, exampleEvent.time, exampleEvent.location);
+            expect(await tokenMasterFixture.tokenMaster.s_totalEvents()).to.be.equal(1)
         });
     });
 });

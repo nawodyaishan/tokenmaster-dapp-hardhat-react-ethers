@@ -4,14 +4,51 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 contract TokenMaster is ERC721 {
-    // State Variables
-    address immutable public i_owner;
+    address public immutable i_owner;
+    uint256 public s_totalEvents;
 
-    constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) {
+    mapping(uint => Event) public m_events;
+
+    struct Event {
+        uint256 id;
+        string name;
+        uint256 cost;
+        uint256 maxTickets;
+        uint256 tickets;
+        string date;
+        string time;
+        string location;
+    }
+
+    constructor(
+        string memory _name,
+        string memory _symbol
+    ) ERC721(_name, _symbol) {
         i_owner = msg.sender;
     }
 
     function getOwner() public view returns (address owner) {
         owner = i_owner;
+    }
+
+    function setEvent(
+        string memory _name,
+        uint256 _cost,
+        uint256 _maxTickets,
+        string memory _date,
+        string memory _time,
+        string memory _location
+    ) public {
+        s_totalEvents++;
+        m_events[s_totalEvents] = Event(
+            1,
+            _name,
+            _cost,
+            _maxTickets,
+            _maxTickets,
+            _date,
+            _time,
+            _location
+        );
     }
 }
