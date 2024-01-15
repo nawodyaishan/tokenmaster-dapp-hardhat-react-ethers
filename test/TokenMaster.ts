@@ -52,21 +52,21 @@ describe("Token Master Unit Testing", async () => {
     })
 
     describe("Deployment", async () => {
-        it("Sets the Name", async () => {
+        it("✅ - Sets the Name", async () => {
             expect(await tokenMasterFixture.tokenMaster.name()).to.equal(DEFAULT_CONTRACT_CONSTRUCTOR_ARGS.name)
         });
 
-        it("Sets the Symbol", async () => {
+        it("✅ - Sets the Symbol", async () => {
             expect(await tokenMasterFixture.tokenMaster.symbol()).to.equal(DEFAULT_CONTRACT_CONSTRUCTOR_ARGS.symbol)
         });
 
-        it("Sets the Owner", async () => {
-            expect(await tokenMasterFixture.tokenMaster.getOwner()).to.equal(tokenMasterFixture.deployer.address)
+        it("✅ - Sets the Owner", async () => {
+            expect(await tokenMasterFixture.tokenMaster.owner()).to.equal(tokenMasterFixture.deployer.address)
         });
     });
 
     describe("Events Interactions", async () => {
-        it("Sets the Events", async () => {
+        it("✅ - Sets the Events - as owner", async () => {
             await tokenMasterFixture.tokenMaster.setEvent(exampleEvent.name, exampleEvent.cost, exampleEvent.maxTickets, exampleEvent.date, exampleEvent.time, exampleEvent.location);
             expect(await tokenMasterFixture.tokenMaster.connect(tokenMasterFixture.deployer).s_totalEvents()).to.be.equal(1)
             await tokenMasterFixture.tokenMaster.setEvent(exampleEvent.name, exampleEvent.cost, exampleEvent.maxTickets, exampleEvent.date, exampleEvent.time, exampleEvent.location);
@@ -75,7 +75,14 @@ describe("Token Master Unit Testing", async () => {
             expect(await tokenMasterFixture.tokenMaster.connect(tokenMasterFixture.deployer).s_totalEvents()).to.be.equal(3)
         });
 
-        it("Gets the exact Event from Id", async () => {
+        it("🟥 - Sets the Events Failure - as a other address", async () => {
+            await expect(tokenMasterFixture.tokenMaster.connect(tokenMasterFixture.buyer)
+                .setEvent(exampleEvent.name, exampleEvent.cost, exampleEvent.maxTickets, exampleEvent.date, exampleEvent.time, exampleEvent.location))
+                .to.be.revertedWithCustomError(tokenMasterFixture.tokenMaster, "OwnableUnauthorizedAccount");
+            expect(await tokenMasterFixture.tokenMaster.connect(tokenMasterFixture.deployer).s_totalEvents()).to.be.equal(0)
+        });
+
+        it("✅ - Gets the exact Event from Id", async () => {
             await tokenMasterFixture.tokenMaster.setEvent(exampleEvent.name, exampleEvent.cost, exampleEvent.maxTickets, exampleEvent.date, exampleEvent.time, exampleEvent.location);
             await tokenMasterFixture.tokenMaster.setEvent(exampleEvent.name, exampleEvent.cost, exampleEvent.maxTickets, exampleEvent.date, exampleEvent.time, exampleEvent.location);
             await tokenMasterFixture.tokenMaster.setEvent(exampleEvent.name, exampleEvent.cost, exampleEvent.maxTickets, exampleEvent.date, exampleEvent.time, exampleEvent.location);

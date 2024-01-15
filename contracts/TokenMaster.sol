@@ -2,9 +2,9 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract TokenMaster is ERC721 {
-    address public immutable i_owner;
+contract TokenMaster is ERC721, Ownable {
     uint256 public s_totalEvents;
 
     mapping(uint => Event) public m_events;
@@ -23,13 +23,7 @@ contract TokenMaster is ERC721 {
     constructor(
         string memory _name,
         string memory _symbol
-    ) ERC721(_name, _symbol) {
-        i_owner = msg.sender;
-    }
-
-    function getOwner() public view returns (address owner) {
-        owner = i_owner;
-    }
+    ) ERC721(_name, _symbol) Ownable(msg.sender) {}
 
     function setEvent(
         string memory _name,
@@ -38,7 +32,7 @@ contract TokenMaster is ERC721 {
         string memory _date,
         string memory _time,
         string memory _location
-    ) public {
+    ) public onlyOwner {
         s_totalEvents++;
         m_events[s_totalEvents] = Event(
             s_totalEvents,
