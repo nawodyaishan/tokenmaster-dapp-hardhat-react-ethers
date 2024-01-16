@@ -95,4 +95,24 @@ describe("Token Master Unit Testing", async () => {
             expect(event.cost).to.be.equal(exampleEvent.cost)
         });
     });
+
+    describe("Minting Interactions", async () => {
+        const ID = 1
+        const SEAT = 50
+        const AMOUNT = ethers.parseUnits('1', 'ether')
+
+        beforeEach(async () => {
+            await tokenMasterFixture.tokenMaster.setEvent(exampleEvent.name, exampleEvent.cost, exampleEvent.maxTickets, exampleEvent.date, exampleEvent.time, exampleEvent.location);
+            await tokenMasterFixture.tokenMaster.setEvent(exampleEvent.name, exampleEvent.cost, exampleEvent.maxTickets, exampleEvent.date, exampleEvent.time, exampleEvent.location);
+            await tokenMasterFixture.tokenMaster.setEvent(exampleEvent.name, exampleEvent.cost, exampleEvent.maxTickets, exampleEvent.date, exampleEvent.time, exampleEvent.location);
+            expect(await tokenMasterFixture.tokenMaster.s_totalEvents()).to.be.equal(3)
+        })
+
+
+        it("✅ - Minting a event ticket - as buyer", async () => {
+            await tokenMasterFixture.tokenMaster.connect(tokenMasterFixture.buyer).mint(ID, SEAT, {value: AMOUNT})
+            expect(await tokenMasterFixture.tokenMaster.s_totalSupply()).to.be.equal(1)
+        });
+    })
+
 });
