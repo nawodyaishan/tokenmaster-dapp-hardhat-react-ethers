@@ -1,5 +1,5 @@
 import {ethers} from "hardhat";
-import {exampleEvent} from "../data/EventData";
+import {eventsForDeployment} from "../data/EventData";
 
 async function main() {
     const tokenMasterFactory = await ethers.getContractFactory("TokenMaster");
@@ -10,8 +10,10 @@ async function main() {
         `TokenMaster deployed to ${tokenMaster.target}`
     );
 
-    await deployedContract.setEvent(exampleEvent.name, exampleEvent.cost, exampleEvent.maxTickets, exampleEvent.date, exampleEvent.time, exampleEvent.location)
-    console.log((await deployedContract.m_events(1)).name)
+    for (const event of eventsForDeployment) {
+        await deployedContract.setEvent(event.name, event.cost, event.maxTickets, event.date, event.time, event.location)
+        console.log((await deployedContract.m_events(event.id)).name)
+    }
 }
 
 main().catch((error) => {
