@@ -4,10 +4,19 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+    error EventDoesNotExist();
+    error InvalidSeatNumber();
+    error SeatAlreadyTaken();
+
 contract TokenMaster is ERC721, Ownable {
     uint256 public s_totalEvents;
+    uint256 public s_totalSupply;
 
     mapping(uint => Event) public m_events;
+    mapping(uint => mapping(uint256 => address)) public m_seats;
+    mapping(uint => uint256[]) public m_takenSeats;
+    mapping(uint256 => mapping(address => bool))
+    public m_hasPurchasedEventTicket;
 
     struct Event {
         uint256 id;
@@ -46,7 +55,29 @@ contract TokenMaster is ERC721, Ownable {
         );
     }
 
-    function getEventFromId(uint256 _id) public view returns (Event memory _event) {
+    function getEventFromId(
+        uint256 _id
+    ) public view returns (Event memory _event) {
         _event = m_events[_id];
+    }
+
+    function mint(uint256 _eventId, uint _seat) public payable {
+        if (_eventId > s_totalEvents) revert EventDoesNotExist();
+        if (_seat == 0 || _seat > m_events[_eventId].maxTickets)
+            revert InvalidSeatNumber();
+        if (m_seats[_eventId][_seat] != address(0)) revert SeatAlreadyTaken();
+
+        // Updating event ticket count
+        m_events[_eventId].tickets -= 1;
+        // Update event buying status
+        m_hasPurchasedEventTicket[_eventId][msg.sender] = true;
+        // Updating seats
+        m_seats[_eventId][_seat] = msg.sender;
+        // Updating seat availability
+        m_takenSeats[_eventId].push(_seat);
+        // Increment total NFT Count
+        s_totalSupply++;
+        // Proceed with minting
+        _safeMint(msg.sender, s_totalSupply);
     }
 }
