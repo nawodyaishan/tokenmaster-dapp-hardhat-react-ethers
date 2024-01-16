@@ -1,7 +1,9 @@
 import {ethers} from "hardhat";
+import {describe} from "mocha"
 import {expect} from "chai";
 import {TokenMaster} from "../typechain-types";
 import {HardhatEthersSigner} from "@nomicfoundation/hardhat-ethers/signers";
+import {exampleEvent} from "../data/EventData";
 
 export interface TokenMasterConstructorArgs {
     name: string
@@ -13,29 +15,6 @@ export interface TokenMasterFixture {
     deployer: HardhatEthersSigner
     buyer: HardhatEthersSigner
 }
-
-interface MockEvent {
-    id: number;
-    name: string;
-    cost: bigint;
-    maxTickets: number;
-    tickets: number;
-    date: string;
-    time: string;
-    location: string;
-}
-
-const exampleEvent: MockEvent = {
-    id: 1,
-    name: "Blockchain & Brews Conference 2024",
-    cost: ethers.parseUnits('1', 'ether'),
-    maxTickets: 500,
-    tickets: 150,
-    date: "2024-06-15",
-    time: "18:00",
-    location: "Metaverse Arena"
-};
-
 
 const DEFAULT_CONTRACT_CONSTRUCTOR_ARGS: TokenMasterConstructorArgs = {name: "TokenMaster", symbol: "NAWO"}
 
