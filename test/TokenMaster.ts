@@ -102,17 +102,66 @@ describe("Token Master Unit Testing", async () => {
         const AMOUNT = ethers.parseUnits('1', 'ether')
 
         beforeEach(async () => {
-            await tokenMasterFixture.tokenMaster.setEvent(exampleEvent.name, exampleEvent.cost, exampleEvent.maxTickets, exampleEvent.date, exampleEvent.time, exampleEvent.location);
-            await tokenMasterFixture.tokenMaster.setEvent(exampleEvent.name, exampleEvent.cost, exampleEvent.maxTickets, exampleEvent.date, exampleEvent.time, exampleEvent.location);
-            await tokenMasterFixture.tokenMaster.setEvent(exampleEvent.name, exampleEvent.cost, exampleEvent.maxTickets, exampleEvent.date, exampleEvent.time, exampleEvent.location);
-            expect(await tokenMasterFixture.tokenMaster.s_totalEvents()).to.be.equal(3)
+            await tokenMasterFixture.tokenMaster.setEvent(exampleEvent.name,
+                exampleEvent.cost,
+                exampleEvent.maxTickets,
+                exampleEvent.date,
+                exampleEvent.time,
+                exampleEvent.location);
+            await tokenMasterFixture.tokenMaster.connect(tokenMasterFixture.buyer).mint(ID, SEAT, {value: AMOUNT})
         })
 
-
-        it("✅ - Minting a event ticket - as buyer", async () => {
-            await tokenMasterFixture.tokenMaster.connect(tokenMasterFixture.buyer).mint(ID, SEAT, {value: AMOUNT})
+        it("✅ - Minting a event ticket - total supply", async () => {
             expect(await tokenMasterFixture.tokenMaster.s_totalSupply()).to.be.equal(1)
         });
-    })
 
+        it("✅ - Minting a event ticket - Tickets count", async () => {
+            expect((await tokenMasterFixture.tokenMaster.getEventFromId(1)).tickets).to.be.equal(exampleEvent.maxTickets - 1)
+        });
+
+        it("✅ - Buying Status", async () => {
+            expect(await tokenMasterFixture.tokenMaster.m_hasPurchasedEventTicket(ID, tokenMasterFixture.buyer.address)).to.be.equal(true)
+        });
+
+        it("✅ - Seat Availability", async () => {
+            expect((await tokenMasterFixture.tokenMaster.getSeatsTakenFromId(ID))[0]).to.be.equal(SEAT)
+            expect((await tokenMasterFixture.tokenMaster.getSeatsTakenFromId(ID)).length).to.be.equal(1)
+        });
+
+        it("✅ - Seat Taken by buyer", async () => {
+            expect(await tokenMasterFixture.tokenMaster.m_seats(ID, SEAT)).to.be.equal(tokenMasterFixture.buyer.address)
+        });
+
+        it("✅ - Update contract balance", async () => {
+            expect(await ethers.provider.getBalance(await tokenMasterFixture.tokenMaster.getAddress())).to.be.equal(AMOUNT)
+        });
+
+        it("🟥 - Should fail if the event ID does not exist", async () => {
+            const nonExistentEventId = 999;
+            const seatNumber = 1;
+            const ticketPrice = ethers.parseEther("0.1");
+            await expect(
+                tokenMasterFixture.tokenMaster.connect(tokenMasterFixture.buyer).mint(nonExistentEventId, seatNumber, {value: ticketPrice})
+            ).to.be.revertedWithCustomError(tokenMasterFixture.tokenMaster, "EventDoesNotExist");
+        });
+
+        it("🟥 - Should fail if the seat number is invalid", async () => {
+            const eventId = 1;
+            const invalidSeatNumber = 501;
+            const ticketPrice = ethers.parseEther("0.1");
+            await tokenMasterFixture.tokenMaster.setEvent(exampleEvent.name, exampleEvent.cost, exampleEvent.maxTickets, exampleEvent.date, exampleEvent.time, exampleEvent.location);
+            await expect(
+                tokenMasterFixture.tokenMaster.connect(tokenMasterFixture.buyer).mint(eventId, invalidSeatNumber, {value: ticketPrice})
+            ).to.be.revertedWithCustomError(tokenMasterFixture.tokenMaster, "InvalidSeatNumber");
+        })
+
+        it("🟥 - Should fail if the seat has already been taken", async () => {
+            const eventId = 1;
+            const seatNumber = 50;
+            const ticketPrice = ethers.parseEther("0.1");
+            await expect(
+                tokenMasterFixture.tokenMaster.connect(tokenMasterFixture.deployer).mint(eventId, seatNumber, {value: ticketPrice})
+            ).to.be.revertedWithCustomError(tokenMasterFixture.tokenMaster, "SeatAlreadyTaken");
+        });
+    })
 });

@@ -55,12 +55,6 @@ contract TokenMaster is ERC721, Ownable {
         );
     }
 
-    function getEventFromId(
-        uint256 _id
-    ) public view returns (Event memory _event) {
-        _event = m_events[_id];
-    }
-
     function mint(uint256 _eventId, uint _seat) public payable {
         if (_eventId > s_totalEvents) revert EventDoesNotExist();
         if (_seat == 0 || _seat > m_events[_eventId].maxTickets)
@@ -79,5 +73,17 @@ contract TokenMaster is ERC721, Ownable {
         s_totalSupply++;
         // Proceed with minting
         _safeMint(msg.sender, s_totalSupply);
+    }
+
+    function getEventFromId(
+        uint256 _id
+    ) public view returns (Event memory _event) {
+        _event = m_events[_id];
+    }
+
+    function getSeatsTakenFromId(
+        uint256 _eventId
+    ) public view returns (uint256[] memory takenSeats) {
+        takenSeats = m_takenSeats[_eventId];
     }
 }
