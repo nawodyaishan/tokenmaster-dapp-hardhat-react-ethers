@@ -4,10 +4,6 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-    error EventDoesNotExist();
-    error InvalidSeatNumber();
-    error SeatAlreadyTaken();
-
 contract TokenMaster is ERC721, Ownable {
     uint256 public s_totalEvents;
     uint256 public s_totalSupply;
@@ -28,6 +24,11 @@ contract TokenMaster is ERC721, Ownable {
         string time;
         string location;
     }
+
+    error EventDoesNotExist();
+    error InvalidSeatNumber();
+    error SeatAlreadyTaken();
+    error MustBeTheOwner();
 
     constructor(
         string memory _name,
@@ -73,6 +74,11 @@ contract TokenMaster is ERC721, Ownable {
         s_totalSupply++;
         // Proceed with minting
         _safeMint(msg.sender, s_totalSupply);
+    }
+
+    function withdraw() public onlyOwner {
+        (bool success,) = owner().call{value: address(this).balance}("");
+        if (!success) revert MustBeTheOwner();
     }
 
     function getEventFromId(

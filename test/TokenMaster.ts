@@ -164,4 +164,42 @@ describe("Token Master Unit Testing", async () => {
             ).to.be.revertedWithCustomError(tokenMasterFixture.tokenMaster, "SeatAlreadyTaken");
         });
     })
+
+    describe("Withdrawal Interactions", async () => {
+        const ID = 1
+        const SEAT = 50
+        const AMOUNT = ethers.parseUnits('1', 'ether')
+
+        beforeEach(async () => {
+            await tokenMasterFixture.tokenMaster.setEvent(exampleEvent.name,
+                exampleEvent.cost,
+                exampleEvent.maxTickets,
+                exampleEvent.date,
+                exampleEvent.time,
+                exampleEvent.location);
+            await tokenMasterFixture.tokenMaster.connect(tokenMasterFixture.buyer).mint(ID, SEAT, {value: AMOUNT})
+        })
+
+        it("✅ - Should allow the owner to withdraw funds", async () => {
+            const initialOwnerBalance = await ethers.provider.getBalance(tokenMasterFixture.deployer.address);
+            const contractBalance = await ethers.provider.getBalance(await tokenMasterFixture.tokenMaster.getAddress());
+            const tx = await tokenMasterFixture.tokenMaster.connect(tokenMasterFixture.deployer).withdraw();
+            const receipt = (await tx.wait())!;
+            const totalGasExpended = receipt.gasUsed * receipt.gasPrice;
+            const finalOwnerBalance = await ethers.provider.getBalance(tokenMasterFixture.deployer.address);
+            expect(finalOwnerBalance.toString()).to.equal(((initialOwnerBalance + contractBalance) - (totalGasExpended)).toString());
+        });
+
+        it("🟥 - Should fail when a non-owner tries to withdraw funds", async () => {
+            await expect(
+                tokenMasterFixture.tokenMaster.connect(tokenMasterFixture.buyer).withdraw()
+            ).to.be.revertedWithCustomError(tokenMasterFixture.tokenMaster, "OwnableUnauthorizedAccount");
+        });
+
+        it("✅ - Should empty the contract balance after a successful withdrawal", async () => {
+            await tokenMasterFixture.tokenMaster.connect(tokenMasterFixture.deployer).withdraw();
+            const newContractBalance = await ethers.provider.getBalance(await tokenMasterFixture.tokenMaster.getAddress());
+            expect(newContractBalance).to.equal(0);
+        });
+    });
 });
