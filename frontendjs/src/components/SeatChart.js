@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import {useEffect, useState} from 'react'
 
 // Import Components
 import Seat from './Seat'
@@ -11,7 +11,7 @@ const SeatChart = ({ occasion, tokenMaster, provider, setToggle }) => {
   const [hasSold, setHasSold] = useState(false)
 
   const getSeatsTaken = async () => {
-    const seatsTaken = await tokenMaster.getSeatsTaken(occasion.id)
+    const seatsTaken = await tokenMaster.getSeatsTakenFromId(occasion.id)
     setSeatsTaken(seatsTaken)
   }
 
